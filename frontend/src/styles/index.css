@@ -1,0 +1,63 @@
+@import url("https://fonts.googleapis.com/css2?family=Satisfy&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+  .max-w-screen-extmedium {
+    max-width: 935px;
+  }
+  .p-full {
+    padding: 100% 100%;
+  }
+  .pb-full {
+    padding-bottom: 100%;
+  }
+  .pt-full {
+    padding-top: 100%;
+  }
+  .pr-full {
+    padding-right: 100%;
+  }
+  .pl-full {
+    padding-left: 100%;
+  }
+}
+
+body {
+  background-color: rgb(250, 250, 250);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+    Arial, sans-serif;
+}
+
+.logo-font {
+  font-family: "Satisfy", cursive;
+}
+
+.swiper-button-next,
+.swiper-button-prev {
+  width: 23px !important;
+  height: 23px !important;
+  background-color: white;
+  border-radius: 50%;
+  box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
+  transform: translateY(50%);
+}
+
+.swiper-button-next:after,
+.swiper-button-prev:after {
+  font-size: 12px !important;
+  color: rgb(63, 61, 61);
+  border-radius: 100%;
+  /* background-color: rgba(12, 17, 32, 0.212); */
+}
+
+.emoji-mart-scroll + .emoji-mart-bar {
+  display: none;
+}
+
+.emoji-mart-anchors button {
+  display: flex;
+  justify-content: center;
+}

@@ -1,0 +1,9 @@
+.active {
+  @apply border-gray-900 text-gray-900;
+}
+
+@media (max-width: 768px) {
+  .active {
+    @apply text-blue-500;
+  }
+}
