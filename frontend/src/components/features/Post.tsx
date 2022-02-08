@@ -7,7 +7,7 @@ interface PostIntf {
   index?: number;
 }
 
-const Post: React.FC<PostIntf> = ({ specialPart = false, index }) => {
+const Post: React.FC<PostIntf> = ({ specialPart=false, index }) => {
   return (
     <div className="grid grid-cols-3 gap-1 md:gap-7">
       <div

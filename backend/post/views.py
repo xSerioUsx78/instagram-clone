@@ -44,7 +44,9 @@ class PostView(generics.ListAPIView):
             Prefetch('comments', queryset=Comment.objects.filter(
                 Q(user__followers__in=user_followings) | Q(
                     user=self.request.user)
-            ).distinct().select_related('user', 'user__profile'), to_attr='filtered_comments'),
+            ).distinct().select_related('user', 'user__profile').prefetch_related(
+                'likes', 'likes__user', 'likes__user__profile'
+            ), to_attr='filtered_comments'),
             Prefetch('user__storys', queryset=Story.objects.exclude(
                 viewers__user=self.request.user
             ), to_attr='filtered_storys'),
@@ -76,9 +78,10 @@ class PostDetailView(generics.GenericAPIView):
                         user=request.user)
                 ).distinct().select_related('user', 'user__profile'), to_attr='filtered_likes'),
                 Prefetch('comments', queryset=Comment.objects.filter(
-                    Q(user__followers__in=user_followings) | Q(
-                        user=request.user)
-                ).distinct().select_related('user', 'user__profile'), to_attr='filtered_comments'),
+                    reply=None
+                ).distinct().select_related('user', 'user__profile',).prefetch_related(
+                    'likes', 'likes__user', 'likes__user__profile'
+                ), to_attr='filtered_comments'),
                 Prefetch('user__storys', queryset=Story.objects.exclude(
                     viewers__user=request.user
                 ), to_attr='filtered_storys'),
@@ -96,11 +99,10 @@ class PostDetailView(generics.GenericAPIView):
         return Response(data, status=status.HTTP_200_OK)
 
 
-class likeView(generics.GenericAPIView):
+class LikeView(generics.GenericAPIView):
     permission_classes = (permissions.IsAuthenticated,)
 
     def post(self, *args, **kwargs):
-        print('post')
         id = self.request.data.get('id')
         if data_is_valid(id):
             obj = get_object_or_404(Post, id=id)
@@ -136,12 +138,14 @@ class CommentView(generics.GenericAPIView):
     def post(self, *args, **kwargs):
         id = self.request.data.get('id')
         text = self.request.data.get('text')
+        reply_id = self.request.data.get('reply_id')
         if data_is_valid(id) and data_is_valid(text):
             obj = get_object_or_404(Post, id=id)
             comment = Comment.objects.create(
                 user=self.request.user,
                 text=text,
                 content_object=obj,
+                reply_id=reply_id
             )
             return Response(
                 {'comment': CommentSerializer(comment, read_only=True).data},

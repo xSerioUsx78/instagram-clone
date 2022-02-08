@@ -45,7 +45,6 @@ interface ShowPickerIntf {
 }
 
 const Post: React.FC<PropsIntf> = ({ posts, setPosts }) => {
-
   const navigate = useNavigate();
 
   const auth = useAppSelector((state) => state.auth);
@@ -65,7 +64,7 @@ const Post: React.FC<PropsIntf> = ({ posts, setPosts }) => {
     );
     return userLike.length > 0 ? (
       <HeartIconSolid
-        className="mr-3 text-red-600"
+        className="mr-3 text-red-600 select-none"
         width={30}
         height={30}
         cursor="pointer"
@@ -73,7 +72,7 @@ const Post: React.FC<PropsIntf> = ({ posts, setPosts }) => {
       />
     ) : (
       <HeartIcon
-        className="mr-3 hover:text-gray-500"
+        className="mr-3 hover:text-gray-500 select-none"
         width={30}
         height={30}
         cursor="pointer"
@@ -204,6 +203,7 @@ const Post: React.FC<PropsIntf> = ({ posts, setPosts }) => {
     const saved = post.saved;
     return saved.length > 0 ? (
       <BookmarkIconSolid
+        className="select-none"
         width={30}
         height={30}
         cursor="pointer"
@@ -211,7 +211,7 @@ const Post: React.FC<PropsIntf> = ({ posts, setPosts }) => {
       />
     ) : (
       <BookmarkIcon
-        className="hover:text-gray-500"
+        className="hover:text-gray-500 select-none"
         width={30}
         height={30}
         cursor="pointer"
@@ -313,6 +313,7 @@ const Post: React.FC<PropsIntf> = ({ posts, setPosts }) => {
             </div>
             <div className="h-full w-full mb-4 post">
               <Swiper
+                onDoubleClick={() => handlePostAddLike(post.id, i)}
                 loop={false}
                 navigation={true}
                 pagination={true}
@@ -321,7 +322,6 @@ const Post: React.FC<PropsIntf> = ({ posts, setPosts }) => {
                 {post.files.map((file) => (
                   <SwiperSlide key={file.id} className="relative pb-full">
                     <img
-                      onDoubleClick={() => handlePostAddLike(post.id, i)}
                       className="w-full h-full object-cover absolute left-0 top-0"
                       src={file.file}
                       alt={post.user.username}

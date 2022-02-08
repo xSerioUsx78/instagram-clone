@@ -1,4 +1,6 @@
-import "swiper/swiper-bundle.min.css";
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
 import { useCallback, useEffect, useState } from "react";
 import Sidebar from "./Sidebar";
 import StoryBar from "./StoryBar";

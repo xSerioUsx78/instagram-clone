@@ -27,7 +27,8 @@ urlpatterns = [
     path('__debug__/', include(debug_toolbar.urls)),
     path('users/', include('users.urls')),
     path('story/', include('story.urls')),
-    path('post/', include('post.urls'))
+    path('post/', include('post.urls')),
+    path('comment/', include('comment.urls'))
 ]
 
 if settings.DEBUG:

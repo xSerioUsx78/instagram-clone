@@ -17,3 +17,22 @@ def decrease_comments(sender, instance, *args, **kwargs):
 
 
 post_delete.connect(decrease_comments, sender=Comment)
+
+
+def increase_replies_count(sender, instance, created, *args, **kwargs):
+    if created:
+        if instance.reply:
+            instance.reply.replies_count += 1
+            instance.reply.save()
+
+
+post_save.connect(increase_replies_count, sender=Comment)
+
+
+def decrease_replies_count(sender, instance, *args, **kwargs):
+    if instance.reply:
+        instance.reply.replies_count -= 1
+        instance.reply.save()
+
+
+post_delete.connect(decrease_replies_count, sender=Comment)

@@ -28,11 +28,24 @@ export interface LikesFieldIntf {
   liked_time: string;
 }
 
+export interface ReplyCommentsFieldIntf {
+  id: number;
+  text: string;
+  user: UserLikesCommentViewerIntf;
+  commented_time: string;
+  likes: LikesFieldIntf[];
+  likes_count: number;
+}
+
 export interface CommentsFieldIntf {
   id: number;
   text: string;
   user: UserLikesCommentViewerIntf;
   commented_time: string;
+  likes: LikesFieldIntf[];
+  likes_count: number;
+  replies: ReplyCommentsFieldIntf[] | [];
+  replies_count: number;
 }
 
 export interface ViewersFieldIntf {
@@ -73,4 +86,9 @@ export interface PostFieldIntf {
 export interface PostIntf {
   loading: boolean;
   data: PostFieldIntf[] | [];
+}
+
+export interface PostDetailIntf {
+  more_posts: PostFieldIntf[] | [];
+  obj: PostFieldIntf | null;
 }
