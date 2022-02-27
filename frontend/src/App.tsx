@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { Route, Routes } from "react-router-dom";
 import { useAppDispatch } from "./redux/store";
 import { loadUser } from "./redux/slice/auth";
+import ScrollToTop from "./components/features/ScrollToTop";
 import Register from "./components/auth/Register";
 import Login from "./components/auth/Login";
 import PrivateRoute from "./components/PrivateRoute";
@@ -25,74 +26,76 @@ const App = () => {
   }, [dispatch]);
 
   return (
-    <Routes>
-      <Route path={routes.register} element={<Register />} />
-      <Route path={routes.login} element={<Login />} />
-      <Route
-        path="/"
-        element={
-          <PrivateRoute>
-            <Layout>
-              <Home />
-            </Layout>
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path={routes.profile}
-        element={
-          <PrivateRoute>
-            <Layout>
-              <Profile />
-            </Layout>
-          </PrivateRoute>
-        }
-      >
-        <Route path="" element={<Posts />} />
-        <Route path="saved" element={<Saved />} />
-        <Route path="tagged" element={<Tagged />} />
-      </Route>
-      <Route
-        path={routes.explore}
-        element={
-          <PrivateRoute>
-            <Layout>
-              <Explore />
-            </Layout>
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path={routes.directInbox}
-        element={
-          <PrivateRoute>
-            <Layout>
-              <Inbox />
-            </Layout>
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path={routes.postDetailStr}
-        element={
-          <PrivateRoute>
-            <Layout>
-              <Post />
-            </Layout>
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="*"
-        element={
-          <PrivateRoute>
-            <Layout>
-              <NotFound />
-            </Layout>
-          </PrivateRoute>
-        }
-      />
-    </Routes>
+    <ScrollToTop>
+      <Routes>
+        <Route path={routes.register} element={<Register />} />
+        <Route path={routes.login} element={<Login />} />
+        <Route
+          path="/"
+          element={
+            <PrivateRoute>
+              <Layout>
+                <Home />
+              </Layout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path={routes.profile}
+          element={
+            <PrivateRoute>
+              <Layout>
+                <Profile />
+              </Layout>
+            </PrivateRoute>
+          }
+        >
+          <Route path="" element={<Posts />} />
+          <Route path="saved" element={<Saved />} />
+          <Route path="tagged" element={<Tagged />} />
+        </Route>
+        <Route
+          path={routes.explore}
+          element={
+            <PrivateRoute>
+              <Layout>
+                <Explore />
+              </Layout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path={routes.directInbox}
+          element={
+            <PrivateRoute>
+              <Layout>
+                <Inbox />
+              </Layout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path={routes.postDetailStr}
+          element={
+            <PrivateRoute>
+              <Layout>
+                <Post />
+              </Layout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="*"
+          element={
+            <PrivateRoute>
+              <Layout>
+                <NotFound />
+              </Layout>
+            </PrivateRoute>
+          }
+        />
+      </Routes>
+    </ScrollToTop>
   );
 };
 

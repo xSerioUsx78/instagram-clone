@@ -90,7 +90,7 @@ class PostDetailView(generics.GenericAPIView):
                 ), to_attr='filtered_saved')
             ), id=id)
         obj_serialized = PostSerializer(obj).data
-        more_posts = posts.filter(user=obj.user).exclude(id=id)
+        more_posts = posts.filter(user=obj.user).exclude(id=id)[:9]
         more_posts_serialized = BasePostSerializer(more_posts, many=True).data
         data = {
             'obj': obj_serialized,
@@ -147,6 +147,7 @@ class CommentView(generics.GenericAPIView):
                 content_object=obj,
                 reply_id=reply_id
             )
+            print(CommentSerializer(comment, read_only=True).data)
             return Response(
                 {'comment': CommentSerializer(comment, read_only=True).data},
                 status=status.HTTP_201_CREATED

@@ -12,10 +12,11 @@ import {
   SwitchHorizontalIcon,
 } from "@heroicons/react/outline";
 import { useAppDispatch } from "../redux/store";
+import { showAddPostModal } from "../redux/slice/addPost";
 import { logoutUser } from "../redux/slice/auth";
 import routes from "../routes";
 
-const Navbar = () => {
+const Navbar: React.FC = () => {
   const dispatch = useAppDispatch();
   const [showSearchResult, setShowSearchResult] = useState<boolean>(false);
   const [showAuthDropDown, setShowAuthDropDown] = useState<boolean>(false);
@@ -94,7 +95,11 @@ const Navbar = () => {
             </li>
             <li className="ml-4">
               <Link to="/">
-                <PlusCircleIcon width={26} height={26} />
+                <PlusCircleIcon
+                  onClick={() => dispatch(showAddPostModal())}
+                  width={26}
+                  height={26}
+                />
               </Link>
             </li>
             <li className="ml-4">

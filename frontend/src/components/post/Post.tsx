@@ -18,7 +18,8 @@ import TextareaAutosize from "react-textarea-autosize";
 import { Swiper, SwiperSlide } from "swiper/react";
 import SwiperCore, { Navigation, Pagination } from "swiper";
 import routes from "../../routes";
-import MorePosts from "../features/Post";
+import PostWrapper from "../features/PostWrapper";
+import MorePost from "../features/Post";
 import { fetchPostDetailService } from "../../services/post";
 import { useAppSelector } from "../../redux/store";
 import {
@@ -39,6 +40,7 @@ import {
   deleteLikeService as commentDeleteLikeService,
   fetchCommentRepliesService,
 } from "../../services/comment";
+import Spin from "../features/animation/Spin";
 
 SwiperCore.use([Navigation, Pagination]);
 
@@ -275,13 +277,22 @@ const Post: React.FC = () => {
       const dataShollow = { ...data };
       dataShollow.obj!.comments_count++;
       if (comment.reply_id) {
-        dataShollow.obj!.comments[comment.reply_id].replies_count++;
+        const cmIndex = dataShollow.obj!.comments.findIndex(
+          (obj) => obj.id === comment.reply_id
+        );
+        dataShollow.obj!.comments[cmIndex].replies_count++;
         setCommentReplies((prevValues) => ({
           ...prevValues,
           [comment.reply_id!]: {
-            isLoading: prevValues[comment.reply_id!].isLoading || false,
-            show: prevValues[comment.reply_id!].show || false,
-            data: prevValues[comment.reply_id!].data.concat([newComment]),
+            isLoading: prevValues[comment.reply_id!]
+              ? prevValues[comment.reply_id!].isLoading || false
+              : false,
+            show: prevValues[comment.reply_id!]
+              ? prevValues[comment.reply_id!].show || false
+              : false,
+            data: prevValues[comment.reply_id!]
+              ? prevValues[comment.reply_id!].data.concat([newComment])
+              : [],
           },
         }));
       } else {
@@ -471,12 +482,12 @@ const Post: React.FC = () => {
     [auth.token]
   );
 
-  const handleViewRepliesOnClick = (id: number) => {
+  const handleViewRepliesOnClick = (id: number, replies_count: number) => {
     const obj = commentReplies[id];
     if (obj && obj.isLoading) {
       return;
     } else {
-      if (obj && obj.data.length > 0) {
+      if (obj && obj.data.length === replies_count) {
         setCommentReplies((preValues) => ({
           ...preValues,
           [id]: {
@@ -501,7 +512,7 @@ const Post: React.FC = () => {
   };
 
   return loading ? (
-    <div>Loading...</div>
+    <Spin textColor="text-blue-500" className="!m-auto" />
   ) : (
     <div>
       <div className="flex mx-14 border text-sm mb-10">
@@ -585,169 +596,179 @@ const Post: React.FC = () => {
                     </div>
                     <div>
                       <span className="text-gray-400 font-medium text-xs">
-                        {data.obj?.created_time} ago
+                        {data.obj?.created_time}
                       </span>
                     </div>
                   </div>
                 </div>
                 {data.obj!.comments.length > 0 &&
                   data.obj!.comments.map((cm, cmi) => (
-                    <div key={cm.id} className="flex justify-between mb-3">
-                      <div className="w-11/12">
-                        <div className="flex">
-                          <div className="mr-1.5 w-2/12">
-                            <img
-                              className="w-9 h-9 rounded-full border"
-                              src={`${endpoint}${cm.user.profile.image}`}
-                              alt={cm.user.username}
-                            />
-                          </div>
-                          <div className="w-10/12">
-                            <div className="mb-4">
-                              <span className="font-medium mr-1">
+                    <div className="mb-3" key={cm.id}>
+                      <div className="flex justify-between">
+                        <div className="w-11/12">
+                          <div className="flex">
+                            <div className="mr-1.5 w-2/12">
+                              <img
+                                className="w-9 h-9 rounded-full border"
+                                src={`${endpoint}${cm.user.profile.image}`}
+                                alt={cm.user.username}
+                              />
+                            </div>
+                            <div className="w-10/12">
+                              <div className="mb-4">
+                                <span className="font-medium mr-1">
+                                  <Link
+                                    to={routes.userProfile(cm.user.username)}
+                                    className="hover:underline"
+                                  >
+                                    {cm.user.username}
+                                  </Link>
+                                </span>
+                                <span>{cm.text}</span>
+                              </div>
+                              <div className="flex text-xs text-gray-400 mb-4">
                                 <Link
-                                  to={routes.userProfile(cm.user.username)}
-                                  className="hover:underline"
+                                  className="font-medium mr-3"
+                                  to="somewhere else"
                                 >
-                                  {cm.user.username}
+                                  <span>{cm.commented_time}</span>
                                 </Link>
-                              </span>
-                              <span>{cm.text}</span>
-                            </div>
-                            <div className="flex text-xs text-gray-400 mb-4">
-                              <Link
-                                className="font-medium mr-3"
-                                to="somewhere else"
-                              >
-                                <span>{cm.commented_time} ago</span>
-                              </Link>
-                              {handleCommentLikeSection(cm)}
-                              <span
-                                className="font-bold cursor-pointer select-none"
-                                onClick={() =>
-                                  handleReplyOnClick(cm.user.username, cm.id)
-                                }
-                              >
-                                Reply
-                              </span>
-                            </div>
-                            {cm.replies_count > 0 ? (
-                              commentReplies[cm.id] ? (
-                                commentReplies[cm.id].show ? (
-                                  <div className="mb-4">
-                                    <button
-                                      className="text-xs text-gray-400 pl-10 font-bold relative active:text-gray-300 before:w-6 before:h-[1px] before:top-[55%] before:left-0 before:bg-gray-500 before:absolute before:active:bg-gray-400"
-                                      onClick={() =>
-                                        handleHideRepliesOnClick(cm.id)
-                                      }
-                                    >
-                                      Hide replies
-                                    </button>
-                                  </div>
+                                {handleCommentLikeSection(cm)}
+                                <span
+                                  className="font-bold cursor-pointer select-none"
+                                  onClick={() =>
+                                    handleReplyOnClick(cm.user.username, cm.id)
+                                  }
+                                >
+                                  Reply
+                                </span>
+                              </div>
+                              {cm.replies_count > 0 ? (
+                                commentReplies[cm.id] ? (
+                                  commentReplies[cm.id].show ? (
+                                    <div>
+                                      <button
+                                        className="text-xs text-gray-400 pl-10 font-bold relative active:text-gray-300 before:w-6 before:h-[1px] before:top-[55%] before:left-0 before:bg-gray-500 before:absolute before:active:bg-gray-400"
+                                        onClick={() =>
+                                          handleHideRepliesOnClick(cm.id)
+                                        }
+                                      >
+                                        Hide replies
+                                      </button>
+                                    </div>
+                                  ) : (
+                                    <div>
+                                      <button
+                                        className="text-xs text-gray-400 pl-10 font-bold relative active:text-gray-300 before:w-6 before:h-[1px] before:top-[55%] before:left-0 before:bg-gray-500 before:absolute before:active:bg-gray-400"
+                                        onClick={() =>
+                                          handleViewRepliesOnClick(
+                                            cm.id,
+                                            cm.replies_count
+                                          )
+                                        }
+                                      >
+                                        {`View replies (${cm.replies_count})`}
+                                      </button>
+                                      {commentReplies[cm.id].isLoading && (
+                                        <Spin
+                                          className="inline-block !ml-2"
+                                          textColor="text-blue-500"
+                                          w="w-4"
+                                          h="h-4"
+                                        />
+                                      )}
+                                    </div>
+                                  )
                                 ) : (
-                                  <div className="mb-4">
+                                  <div>
                                     <button
                                       className="text-xs text-gray-400 pl-10 font-bold relative active:text-gray-300 before:w-6 before:h-[1px] before:top-[55%] before:left-0 before:bg-gray-500 before:absolute before:active:bg-gray-400"
                                       onClick={() =>
-                                        handleViewRepliesOnClick(cm.id)
+                                        handleViewRepliesOnClick(
+                                          cm.id,
+                                          cm.replies_count
+                                        )
                                       }
                                     >
                                       {`View replies (${cm.replies_count})`}
                                     </button>
-                                    {commentReplies[cm.id].isLoading && (
-                                      <span>Im Loading</span>
-                                    )}
                                   </div>
                                 )
                               ) : (
-                                <div className="mb-4">
-                                  <button
-                                    className="text-xs text-gray-400 pl-10 font-bold relative active:text-gray-300 before:w-6 before:h-[1px] before:top-[55%] before:left-0 before:bg-gray-500 before:absolute before:active:bg-gray-400"
-                                    onClick={() =>
-                                      handleViewRepliesOnClick(cm.id)
-                                    }
-                                  >
-                                    {`View replies (${cm.replies_count})`}
-                                  </button>
-                                </div>
-                              )
-                            ) : (
-                              <></>
-                            )}
-                            {commentReplies[cm.id] &&
-                              commentReplies[cm.id].show && (
-                                <div>
-                                  {commentReplies[cm.id].data.length > 0 &&
-                                    commentReplies[cm.id].data.map(
-                                      (rep, repi) => (
-                                        <div
-                                          key={rep.id}
-                                          className="flex justify-between mb-2"
-                                        >
-                                          <div className="w-11/12">
-                                            <div className="flex">
-                                              <div className="mr-1.5 w-2/12">
-                                                <img
-                                                  className="w-9 h-9 rounded-full border"
-                                                  src={rep.user.profile.image}
-                                                  alt={rep.user.username}
-                                                />
-                                              </div>
-                                              <div className="w-10/12">
-                                                <div className="mb-4">
-                                                  <span className="font-medium mr-1">
-                                                    <Link
-                                                      to={routes.userProfile(
-                                                        rep.user.username
-                                                      )}
-                                                      className="hover:underline"
-                                                    >
-                                                      {rep.user.username}
-                                                    </Link>
-                                                  </span>
-                                                  <span>{rep.text}</span>
-                                                </div>
-                                                <div className="flex text-xs text-gray-400 mb-4">
-                                                  <Link
-                                                    className="font-medium mr-3"
-                                                    to="somewhere else"
-                                                  >
-                                                    <span>
-                                                      {rep.commented_time} ago
-                                                    </span>
-                                                  </Link>
-                                                  {handleCommentLikeSection(
-                                                    rep
-                                                  )}
-                                                  <span
-                                                    className="font-bold cursor-pointer select-none"
-                                                    onClick={() =>
-                                                      handleReplyOnClick(
-                                                        rep.user.username,
-                                                        cm.id
-                                                      )
-                                                    }
-                                                  >
-                                                    Reply
-                                                  </span>
-                                                </div>
-                                              </div>
-                                            </div>
-                                          </div>
-                                          {handleReplyHeartIcon(
-                                            rep,
-                                            cm.id,
-                                            repi
-                                          )}
-                                        </div>
-                                      )
-                                    )}
-                                </div>
+                                <></>
                               )}
+                            </div>
                           </div>
                         </div>
+                        {handleCommentHeartIcon(cm, cmi)}
                       </div>
-                      {handleCommentHeartIcon(cm, cmi)}
+                      <div className="ml-12 mt-3">
+                        {commentReplies[cm.id] && commentReplies[cm.id].show && (
+                          <div>
+                            {commentReplies[cm.id].data.length > 0 &&
+                              commentReplies[cm.id].data.map((rep, repi) => (
+                                <div
+                                  key={rep.id}
+                                  className="flex justify-between mb-2"
+                                >
+                                  <div className="w-11/12">
+                                    <div className="flex">
+                                      <div className="mr-1.5 w-2/12">
+                                        <img
+                                          className="w-9 h-9 rounded-full border"
+                                          src={
+                                            rep.user.profile.image.startsWith(
+                                              "http://"
+                                            )
+                                              ? rep.user.profile.image
+                                              : `${endpoint}${rep.user.profile.image}`
+                                          }
+                                          alt={rep.user.username}
+                                        />
+                                      </div>
+                                      <div className="w-10/12">
+                                        <div className="mb-4">
+                                          <span className="font-medium mr-1">
+                                            <Link
+                                              to={routes.userProfile(
+                                                rep.user.username
+                                              )}
+                                              className="hover:underline"
+                                            >
+                                              {rep.user.username}
+                                            </Link>
+                                          </span>
+                                          <span>{rep.text}</span>
+                                        </div>
+                                        <div className="flex text-xs text-gray-400 mb-4">
+                                          <Link
+                                            className="font-medium mr-3"
+                                            to="somewhere else"
+                                          >
+                                            <span>{rep.commented_time}</span>
+                                          </Link>
+                                          {handleCommentLikeSection(rep)}
+                                          <span
+                                            className="font-bold cursor-pointer select-none"
+                                            onClick={() =>
+                                              handleReplyOnClick(
+                                                rep.user.username,
+                                                cm.id
+                                              )
+                                            }
+                                          >
+                                            Reply
+                                          </span>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  {handleReplyHeartIcon(rep, cm.id, repi)}
+                                </div>
+                              ))}
+                          </div>
+                        )}
+                      </div>
                     </div>
                   ))}
               </div>
@@ -778,7 +799,7 @@ const Post: React.FC = () => {
                   to={routes.postDetail(1)}
                   className="text-gray-400 focus:text-opacity-70 uppercase"
                 >
-                  <small>2 week ago</small>
+                  <small>2 weeks</small>
                 </Link>
               </div>
             </div>
@@ -852,13 +873,26 @@ const Post: React.FC = () => {
                 More posts from{" "}
                 <Link
                   className="text-gray-700"
-                  to={routes.userProfile("imortezaw_")}
+                  to={routes.userProfile(data!.obj?.user.username!)}
                 >
-                  imortezaw_
+                  {data!.obj?.user.username}
                 </Link>
               </h2>
             </div>
-            <MorePosts />
+            <PostWrapper>
+              {data!.more_posts.map((post) => (
+                <MorePost
+                  key={post.id}
+                  multiFile={post.files.length > 1}
+                  image={
+                    post.files[0] ? `${endpoint}${post.files[0].file}` : ""
+                  }
+                  likes_count={post.likes_count}
+                  comments_count={post.comments_count}
+                  link={routes.postDetail(post.id)}
+                />
+              ))}
+            </PostWrapper>
           </div>
         </>
       )}
