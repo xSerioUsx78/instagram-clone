@@ -41,6 +41,7 @@ import {
   fetchCommentRepliesService,
 } from "../../services/comment";
 import Spin from "../features/animation/Spin";
+import { getPostDescription, getCommentText } from "../../utils/utility";
 
 SwiperCore.use([Navigation, Pagination]);
 
@@ -580,19 +581,7 @@ const Post: React.FC = () => {
                           {data.obj?.user.username}
                         </Link>
                       </span>
-                      <span>
-                        {data.obj?.description}
-                        {data.obj!.tags.length > 0 &&
-                          data.obj?.tags.map((tag) => (
-                            <Link
-                              key={tag}
-                              to={routes.tags(tag)}
-                              className="ml-1 text-blue-800 focus:opacity-50"
-                            >
-                              #{tag}
-                            </Link>
-                          ))}
-                      </span>
+                      <span>{getPostDescription(data.obj?.description!)}</span>
                     </div>
                     <div>
                       <span className="text-gray-400 font-medium text-xs">
@@ -624,7 +613,7 @@ const Post: React.FC = () => {
                                     {cm.user.username}
                                   </Link>
                                 </span>
-                                <span>{cm.text}</span>
+                                <span>{getCommentText(cm.text)}</span>
                               </div>
                               <div className="flex text-xs text-gray-400 mb-4">
                                 <Link
@@ -738,7 +727,9 @@ const Post: React.FC = () => {
                                               {rep.user.username}
                                             </Link>
                                           </span>
-                                          <span>{rep.text}</span>
+                                          <span>
+                                            {getCommentText(rep.text)}
+                                          </span>
                                         </div>
                                         <div className="flex text-xs text-gray-400 mb-4">
                                           <Link

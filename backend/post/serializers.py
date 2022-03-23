@@ -36,18 +36,26 @@ class PostFilesSerializer(serializers.ModelSerializer):
         exclude = ('post',)
 
 
-class PostSavedSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = PostFiles
-        fields = ('id',)
-
-
 class BasePostSerializer(serializers.ModelSerializer):
     files = PostFilesSerializer(many=True, read_only=True)
 
     class Meta:
         model = Post
         fields = ('id', 'files', 'likes_count', 'comments_count')
+
+
+class BasePostSavedSerializer(serializers.ModelSerializer):
+    post = BasePostSerializer(read_only=True)
+
+    class Meta:
+        model = PostSaved
+        fields = ('id', 'post',)
+
+
+class PostSavedSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PostSaved
+        fields = ('id',)
 
 
 class PostSerializer(TaggitSerializer, serializers.ModelSerializer):
@@ -77,3 +85,10 @@ class PostSerializer(TaggitSerializer, serializers.ModelSerializer):
         if obj.updated_time:
             return timesince.timesince(obj.updated_time, timezone.now())
         return None
+
+
+class CreatePostSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Post
+        fields = ('id', 'description', 'tags', 'location', 'users_tag')

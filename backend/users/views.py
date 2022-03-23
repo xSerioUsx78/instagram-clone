@@ -1,9 +1,15 @@
 from django.contrib.auth import get_user_model
+from django.shortcuts import get_object_or_404
+from django.db.models import Q
 from rest_framework import generics, permissions
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 from rest_framework import status
-from .serializers import UserSerializer, RegisterSerializer, LoginSerializer
+from .serializers import (
+    UserSerializer, RegisterSerializer, LoginSerializer,
+    UserSuggestionsSerializer
+)
+from .models import Following
 
 
 User = get_user_model()
@@ -50,9 +56,78 @@ class LogoutView(generics.GenericAPIView):
 
 
 class UserView(generics.RetrieveAPIView):
-    permission_classes = [permissions.IsAuthenticated, ]
+    permission_classes = [permissions.IsAuthenticated]
     serializer_class = UserSerializer
     queryset = User.objects.all()
 
     def get_object(self):
         return self.request.user
+
+
+class UserInfoView(generics.GenericAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, username, *args, **kwargs):
+        user = get_object_or_404(User, username=username)
+        posts_count = user.posts.count()
+        followings_count = user.followings.count()
+        followers_count = user.followers.count()
+        followed_by_user = user.followers.filter(follower_user=self.request.user).exists()
+        user_data = UserSerializer(user, read_only=True, context={
+                                   'request': request}).data
+        data = {
+            "posts_count": posts_count,
+            "followings_count": followings_count,
+            "followers_count": followers_count,
+            'followed_by_user': followed_by_user,
+            'user': user_data
+        }
+        return Response(data)
+
+
+class FollowUserView(generics.GenericAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, *args, **kwargs):
+        follower_user = self.request.user
+        following_user_username = self.request.data.get('username')
+        if follower_user.followings.filter(following_user__username=following_user_username).exists():
+            return Response({"message": "The was followed already."}, status=status.HTTP_200_OK)
+            
+        following_user = User.objects.get(username=following_user_username)
+        Following.objects.create(follower_user=follower_user, following_user=following_user)
+        return Response({"message": "The user was followed successfully."}, status=status.HTTP_201_CREATED)
+
+
+class UnFollowUserView(generics.GenericAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, *args, **kwargs):
+        follower_user = self.request.user
+        following_user_username = self.request.data.get('username')
+        try:
+            Following.objects.get(
+                follower_user=follower_user, 
+                following_user__username=following_user_username
+            ).delete()
+            return Response({"message": "The user unfollowed successfully"}, status=status.HTTP_200_OK)
+        except:
+            return Response({"message": "The user was unfollowed already"}, status=status.HTTP_200_OK)
+
+class UserSuggestionsView(generics.ListAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = UserSuggestionsSerializer
+    queryset = User.objects.all()
+
+    def get_queryset(self, *args, **kwargs):
+        queryset = super().get_queryset()
+        user = self.request.user
+        followers_users = user.followers.values_list("follower_user__username", flat=True)
+        followings_users = user.followings.values_list("following_user__username", flat=True)
+        queryset = queryset.filter(is_active=True).exclude(
+            (
+                Q(username__in=followings_users) | Q(id=user.id) 
+                |
+                Q(username__in=followers_users) | Q(id=user.id))
+        ).distinct()[:5]
+        return queryset

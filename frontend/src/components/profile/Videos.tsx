@@ -1,6 +1,6 @@
 import Post from "../features/Post";
 
-const Tagged = () => {
+const Videos = () => {
   return (
     <div>
       <Post />
@@ -8,4 +8,4 @@ const Tagged = () => {
   );
 };
 
-export default Tagged;
+export default Videos;

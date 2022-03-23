@@ -27,7 +27,11 @@ import {
   deletePostFromSaved,
   postCommentService,
 } from "../../services/post";
-import { limitText } from "../../utils/utility";
+import {
+  limitText,
+  getPostDescription,
+  getCommentText,
+} from "../../utils/utility";
 
 SwiperCore.use([Navigation, Pagination]);
 
@@ -136,7 +140,7 @@ const Post: React.FC<PropsIntf> = ({ posts, setPosts }) => {
             {comment.user.username}
           </Link>
         </span>
-        <span>{limitText(comment.text, 150)}</span>
+        <span>{getCommentText(limitText(comment.text, 150))}</span>
       </div>
     ));
   };
@@ -360,19 +364,7 @@ const Post: React.FC<PropsIntf> = ({ posts, setPosts }) => {
                     {post.user.username}
                   </Link>
                 </span>
-                <span>
-                  {post.description}
-                  {post.tags.length > 0 &&
-                    post.tags.map((tag) => (
-                      <Link
-                        key={tag}
-                        to={routes.tags(tag)}
-                        className="ml-1 text-blue-800 focus:opacity-50"
-                      >
-                        #{tag}
-                      </Link>
-                    ))}
-                </span>
+                <span>{getPostDescription(post.description)}</span>
               </div>
               <div className="mb-0.5">
                 <Link

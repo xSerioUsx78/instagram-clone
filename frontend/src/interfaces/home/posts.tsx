@@ -83,12 +83,32 @@ export interface PostFieldIntf {
   saved: SavedFieldIntf[];
 }
 
+export interface MinimalPostFieldIntf {
+  id: number;
+  files: FilesFieldIntf[];
+  comments_count: number;
+  likes_count: number;
+}
+
 export interface PostIntf {
   loading: boolean;
   data: PostFieldIntf[] | [];
 }
 
+export interface BaseSavedFieldIntf {
+  id: number;
+  post: MinimalPostFieldIntf;
+}
+
 export interface PostDetailIntf {
-  more_posts: PostFieldIntf[] | [];
+  more_posts: MinimalPostFieldIntf[] | [];
   obj: PostFieldIntf | null;
+}
+
+export interface PostFormIntf {
+  files: File[];
+  description: string;
+  location: string;
+  tags: string[];
+  users_tag: string[];
 }

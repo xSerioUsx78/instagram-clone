@@ -63,3 +63,31 @@ export const deletePostFromSaved = async (
   });
   return res;
 };
+
+export const postCreateService = async (
+  token: string | null,
+  data: FormData
+) => {
+  const res = await authAxios(token).post(requests.postCreate, data);
+  return res;
+};
+
+export const fetchUserProfilePostsService = async (
+  token: string | null,
+  username: string
+) => {
+  const res = await authAxios(token).get(
+    requests.fetchUserProfilePosts(username)
+  );
+  return res;
+};
+
+export const fetchUserProfileSavedPostsService = async (
+  token: string | null,
+  username: string
+) => {
+  const res = await authAxios(token).get(
+    requests.fetchUserProfileSavedPosts(username)
+  );
+  return res;
+};

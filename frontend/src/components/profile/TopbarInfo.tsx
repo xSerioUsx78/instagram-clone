@@ -1,9 +1,77 @@
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { CogIcon } from "@heroicons/react/outline";
 import useWindowDimensions from "../../hooks/useWindowDimensions";
+import { useAppSelector } from "../../redux/store";
+import { userProfileTopBarInfo } from "../../interfaces/auth";
+import {
+  fetchUserInfoService,
+  followUserService,
+  unFollowUserService,
+} from "../../services/user";
 
-const TopbarInfo = () => {
+interface PropsIntf {
+  username: string;
+}
+
+const TopbarInfo: React.FC<PropsIntf> = ({ username }) => {
   const { width } = useWindowDimensions();
+
+  const auth = useAppSelector((state) => state.auth);
+
+  const [userInfo, setUserInfo] = useState<userProfileTopBarInfo>({
+    posts_count: 0,
+    followings_count: 0,
+    followers_count: 0,
+    followed_by_user: false,
+    user: null,
+  });
+
+  useEffect(() => {
+    const handleFetchUserInfo = async () => {
+      try {
+        const res = await fetchUserInfoService(auth.token, username);
+        const data = res.data as userProfileTopBarInfo;
+        console.log(data);
+        setUserInfo({
+          posts_count: data.posts_count,
+          followings_count: data.followings_count,
+          followers_count: data.followers_count,
+          followed_by_user: data.followed_by_user,
+          user: data.user,
+        });
+      } catch (e) {
+        console.log(e);
+      }
+    };
+    handleFetchUserInfo();
+  }, [auth.token, username]);
+
+  const handleFollowUser = async () => {
+    try {
+      await followUserService(auth.token, username);
+      setUserInfo({
+        ...userInfo,
+        followed_by_user: true,
+        followers_count: ++userInfo.followers_count,
+      });
+    } catch (e: any) {
+      console.log(e);
+    }
+  };
+
+  const handleUnFollowUser = async () => {
+    try {
+      await unFollowUserService(auth.token, username);
+      setUserInfo({
+        ...userInfo,
+        followed_by_user: false,
+        followers_count: --userInfo.followers_count,
+      });
+    } catch (e: any) {
+      console.log(e);
+    }
+  };
 
   return (
     <div>
@@ -17,8 +85,8 @@ const TopbarInfo = () => {
             >
               <img
                 className="w-20 h-20 md:w-40 md:h-40 rounded-full border object-cover"
-                src="https://www.kindpng.com/picc/m/24-248253_user-profile-default-image-png-clipart-png-download.png"
-                alt="admin"
+                src={userInfo.user?.profile?.image}
+                alt={userInfo.user?.username}
               />
             </label>
             <input
@@ -32,9 +100,9 @@ const TopbarInfo = () => {
           <div className="mt-4">
             <div className="flex items-center mb-4 md:mb-6">
               <h2 className="text-3xl text-gray-600 font-light mr-5">
-                imortezaw_
+                {userInfo.user?.username}
               </h2>
-              {width > 767 && (
+              {width > 767 && userInfo.user?.username === auth.user?.username && (
                 <Link
                   to="/"
                   className="border font-medium py-1 px-2 rounded text-sm mr-3"
@@ -42,9 +110,31 @@ const TopbarInfo = () => {
                   Edit Profile
                 </Link>
               )}
-              <CogIcon width={27} height={27} cursor="pointer" />
+              {userInfo.user?.username === auth.user?.username && (
+                <CogIcon width={27} height={27} cursor="pointer" />
+              )}
+              {userInfo.user?.username !== auth.user?.username &&
+                (userInfo.followed_by_user ? (
+                  <button
+                    onClick={handleUnFollowUser}
+                    className={`border font-medium py-1 px-2 rounded text-sm mr-3 ${
+                      width < 767 ? "block text-center" : ""
+                    }`}
+                  >
+                    Unfollow
+                  </button>
+                ) : (
+                  <button
+                    onClick={handleFollowUser}
+                    className={`border font-medium py-1 px-2 rounded text-sm mr-3 ${
+                      width < 767 ? "block text-center" : ""
+                    }`}
+                  >
+                    Follow
+                  </button>
+                ))}
             </div>
-            {width < 767 && (
+            {width < 767 && userInfo.user?.username === auth.user?.username && (
               <Link
                 to="/"
                 className="border font-medium py-1 px-2 rounded text-sm mr-3 block text-center"
@@ -55,16 +145,16 @@ const TopbarInfo = () => {
             {width > 767 && (
               <div className="text-gray-700">
                 <span className="mr-10">
-                  <b>5</b> posts
+                  <b>{userInfo.posts_count}</b> posts
                 </span>
                 <span className="mr-10">
                   <Link to="">
-                    <b>1,039</b> followers
+                    <b>{userInfo.followers_count}</b> followers
                   </Link>
                 </span>
                 <span>
                   <Link to="">
-                    <b>477</b> following
+                    <b>{userInfo.followings_count}</b> following
                   </Link>
                 </span>
               </div>
@@ -78,7 +168,7 @@ const TopbarInfo = () => {
             <Link to="" className="py-3 text-center block">
               <div>
                 <span>
-                  <b>5</b>
+                  <b>{userInfo.posts_count}</b>
                 </span>
               </div>
               <div>
@@ -90,7 +180,7 @@ const TopbarInfo = () => {
             <Link to="" className="py-3 text-center block">
               <div>
                 <span>
-                  <b>1,039</b>
+                  <b>{userInfo.followers_count}</b>
                 </span>
               </div>
               <div>
@@ -102,7 +192,7 @@ const TopbarInfo = () => {
             <Link to="" className="py-3 text-center block">
               <div>
                 <span>
-                  <b>477</b>
+                  <b>{userInfo.followings_count}</b>
                 </span>
               </div>
               <div>

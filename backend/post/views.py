@@ -10,8 +10,11 @@ from like.models import Like
 from like.serializers import LikeSerializer
 from view.models import Viewer
 from story.models import Story
-from .models import Post, PostSaved
-from .serializers import PostSavedSerializer, PostSerializer, BasePostSerializer
+from .models import Post, PostFiles, PostSaved
+from .serializers import (
+    PostSavedSerializer, PostSerializer, BasePostSerializer,
+    CreatePostSerializer, BasePostSavedSerializer
+)
 
 
 class PostView(generics.ListAPIView):
@@ -31,8 +34,8 @@ class PostView(generics.ListAPIView):
         user_followings = self.request.user.followings.all()
         queryset = super().get_queryset()
         queryset = queryset.filter(
-            user__followers__in=user_followings
-        )\
+            Q(user__followers__in=user_followings) | Q(user=self.request.user)
+        ).order_by('-created_time')\
             .prefetch_related(
             Prefetch('viewers', queryset=Viewer.objects.filter(
                 user__followers__in=user_followings
@@ -147,7 +150,6 @@ class CommentView(generics.GenericAPIView):
                 content_object=obj,
                 reply_id=reply_id
             )
-            print(CommentSerializer(comment, read_only=True).data)
             return Response(
                 {'comment': CommentSerializer(comment, read_only=True).data},
                 status=status.HTTP_201_CREATED
@@ -188,3 +190,52 @@ class PostSavedView(generics.GenericAPIView):
             saved.delete()
             return Response(status=status.HTTP_201_CREATED)
         return Response({'detail': 'No data provided!'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class CreatePostView(generics.GenericAPIView):
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def post(self, *args, **kwagrs):
+        user = self.request.user
+
+        # Creating the post
+        post_serializer = CreatePostSerializer(data=self.request.data)
+        post_serializer.is_valid(raise_exception=True)
+        post_instance = post_serializer.save(user=user)
+
+        # Create and adding the tags for the post instance
+        tags = self.request.data.getlist('tags')
+        post_instance.tags.set(tags)
+
+        # Getting the list of the files and creating them
+        for file in self.request.data.getlist('files'):
+            PostFiles.objects.create(post=post_instance, file=file)
+
+        return Response(data=PostSerializer(post_instance).data, status=status.HTTP_201_CREATED)
+
+
+class UserProfilePostsView(generics.ListAPIView):
+    permission_classes = (permissions.IsAuthenticated,)
+    serializer_class = BasePostSerializer
+    queryset = Post.objects.prefetch_related('files',)
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        return queryset.filter(user__username=self.kwargs['username']).order_by('-created_time')
+
+
+class UserProfileSavedPostsView(generics.ListAPIView):
+    permission_classes = (permissions.IsAuthenticated,)
+    serializer_class = BasePostSavedSerializer
+    queryset = PostSaved.objects.select_related(
+        'post',).prefetch_related('post__files')
+
+    def get(self, request, *args, **kwargs):
+        username = self.kwargs['username']
+        if self.request.user.username == username:
+            return super().get(request, *args, **kwargs)
+        return Response(status=status.HTTP_401_UNAUTHORIZED)
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        return queryset.filter(user__username=self.kwargs['username'])

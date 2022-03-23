@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     'django_cleanup.apps.CleanupConfig',
     'phonenumber_field',
     'taggit',
-    # 'debug_toolbar',
+    "ckeditor",
 
     # My apps
     'users',
@@ -60,12 +60,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    # 'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
-
-# INTERNAL_IPS = [
-#     '127.0.0.1',
-# ]
 
 ROOT_URLCONF = 'core.urls'
 
@@ -143,7 +138,20 @@ AUTH_USER_MODEL = 'users.User'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.TokenAuthentication',
-        # 'rest_framework.authentication.SessionAuthentication'
+        'rest_framework.authentication.TokenAuthentication'
     ]
 }
+
+CKEDITOR_UPLOAD_PATH = "ckeditor/"
+
+ENABLE_DEBUG_TOOLBAR = False
+
+if ENABLE_DEBUG_TOOLBAR:
+    INSTALLED_APPS.append('debug_toolbar')
+    MIDDLEWARE.append('debug_toolbar.middleware.DebugToolbarMiddleware')
+    INTERNAL_IPS = [
+        '127.0.0.1',
+    ]
+    REST_FRAMEWORK['DEFAULT_AUTHENTICATION_CLASSES'] = [
+        'rest_framework.authentication.SessionAuthentication'
+    ]

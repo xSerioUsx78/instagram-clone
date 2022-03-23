@@ -6,11 +6,13 @@ import ScrollToTop from "./components/features/ScrollToTop";
 import Register from "./components/auth/Register";
 import Login from "./components/auth/Login";
 import PrivateRoute from "./components/PrivateRoute";
+import UserProtect from "./components/UserProtect";
 import Layout from "./components/Layout";
 import Home from "./components/home/Home";
 import Profile from "./components/profile/Profile";
 import Posts from "./components/profile/Posts";
 import Saved from "./components/profile/Saved";
+import Videos from "./components/profile/Videos";
 import Tagged from "./components/profile/Tagged";
 import Explore from "./components/explore/Explore";
 import Inbox from "./components/direct/Inbox";
@@ -41,7 +43,7 @@ const App = () => {
           }
         />
         <Route
-          path={routes.profile}
+          path={routes.userProfileStr}
           element={
             <PrivateRoute>
               <Layout>
@@ -51,7 +53,15 @@ const App = () => {
           }
         >
           <Route path="" element={<Posts />} />
-          <Route path="saved" element={<Saved />} />
+          <Route
+            path="saved"
+            element={
+              <UserProtect>
+                <Saved />
+              </UserProtect>
+            }
+          />
+          <Route path="channel" element={<Videos />} />
           <Route path="tagged" element={<Tagged />} />
         </Route>
         <Route

@@ -18,6 +18,13 @@ class ProfileSerializer(serializers.ModelSerializer):
         exclude = ('user',)
 
 
+class ProfileImageSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Profile
+        fields = ('image',)
+
+
 class UserBaseSerializer(serializers.ModelSerializer):
 
     profile = ProfileSerializer(read_only=True)
@@ -109,3 +116,11 @@ class LoginSerializer(serializers.Serializer):
         raise serializers.ValidationError(
             "Username or Password is invalid!"
         )
+
+class UserSuggestionsSerializer(serializers.ModelSerializer):
+
+    profile = ProfileImageSerializer(read_only=True)
+
+    class Meta:
+        model = User
+        fields = ('id', 'username', 'is_verified', 'profile')

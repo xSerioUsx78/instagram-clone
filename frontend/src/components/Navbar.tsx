@@ -11,13 +11,16 @@ import {
   CogIcon,
   SwitchHorizontalIcon,
 } from "@heroicons/react/outline";
-import { useAppDispatch } from "../redux/store";
+import { useAppDispatch, useAppSelector } from "../redux/store";
 import { showAddPostModal } from "../redux/slice/addPost";
 import { logoutUser } from "../redux/slice/auth";
 import routes from "../routes";
 
 const Navbar: React.FC = () => {
   const dispatch = useAppDispatch();
+
+  const auth = useAppSelector((state) => state.auth);
+
   const [showSearchResult, setShowSearchResult] = useState<boolean>(false);
   const [showAuthDropDown, setShowAuthDropDown] = useState<boolean>(false);
 
@@ -94,13 +97,13 @@ const Navbar: React.FC = () => {
               </Link>
             </li>
             <li className="ml-4">
-              <Link to="/">
+              <span className="select-none cursor-pointer">
                 <PlusCircleIcon
                   onClick={() => dispatch(showAddPostModal())}
                   width={26}
                   height={26}
                 />
-              </Link>
+              </span>
             </li>
             <li className="ml-4">
               <Link to={routes.explore}>
@@ -131,8 +134,8 @@ const Navbar: React.FC = () => {
                     <ul>
                       <li>
                         <Link
-                          className="flex items-center px-4 hover:bg-gray-50 focus:bg-gray-200 py-2"
-                          to={routes.profile}
+                          className="flex items-center px-4 hover:bg-gray-50 active:bg-gray-200 py-2 rounded-t-md"
+                          to={routes.userProfile(auth.user?.username!)}
                         >
                           <UserCircleIcon width={20} height={20} />
                           <span className="ml-2">Profile</span>
@@ -140,8 +143,10 @@ const Navbar: React.FC = () => {
                       </li>
                       <li>
                         <Link
-                          className="flex items-center px-4 hover:bg-gray-50 focus:bg-gray-200 py-2"
-                          to={`${routes.profile}/saved`}
+                          className="flex items-center px-4 hover:bg-gray-50 active:bg-gray-200 py-2"
+                          to={`${routes.userProfile(
+                            auth.user?.username!
+                          )}/saved`}
                         >
                           <BookmarkIcon width={20} height={20} />
                           <span className="ml-2">Saved</span>
@@ -149,7 +154,7 @@ const Navbar: React.FC = () => {
                       </li>
                       <li>
                         <Link
-                          className="flex items-center px-4 hover:bg-gray-50 focus:bg-gray-200 py-2"
+                          className="flex items-center px-4 hover:bg-gray-50 active:bg-gray-200 py-2"
                           to=""
                         >
                           <CogIcon width={20} height={20} />
@@ -158,7 +163,7 @@ const Navbar: React.FC = () => {
                       </li>
                       <li>
                         <Link
-                          className="flex items-center px-4 hover:bg-gray-50 focus:bg-gray-200 py-2"
+                          className="flex items-center px-4 hover:bg-gray-50 active:bg-gray-200 py-2"
                           to=""
                         >
                           <SwitchHorizontalIcon width={20} height={20} />
@@ -170,7 +175,7 @@ const Navbar: React.FC = () => {
                         <span
                           onClick={handleLogout}
                           className="flex items-center px-5 cursor-pointer
-                        hover:bg-gray-50 0 focus:bg-gray-200 py-2"
+                        hover:bg-gray-50 0 active:bg-gray-200 py-2 rounded-b-md"
                         >
                           Log Out
                         </span>
