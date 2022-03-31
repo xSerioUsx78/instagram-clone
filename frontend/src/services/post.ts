@@ -6,6 +6,11 @@ export const fetchPostsService = async (token: string | null) => {
   return res;
 };
 
+export const fetchExcplorePostsService = async (token: string | null) => {
+  const res = await authAxios(token).get(requests.getExplorePosts);
+  return res;
+};
+
 export const fetchPostDetailService = async (
   token: string | null,
   postID: number

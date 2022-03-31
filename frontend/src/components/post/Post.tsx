@@ -876,7 +876,7 @@ const Post: React.FC = () => {
                   key={post.id}
                   multiFile={post.files.length > 1}
                   image={
-                    post.files[0] ? `${endpoint}${post.files[0].file}` : ""
+                    post.files[0] ? `${endpoint}${post.files[0].file}` : null
                   }
                   likes_count={post.likes_count}
                   comments_count={post.comments_count}

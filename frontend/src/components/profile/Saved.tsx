@@ -45,7 +45,7 @@ const Posts = () => {
               key={savedPost.post.id}
               multiFile={savedPost.post.files.length > 1}
               image={
-                savedPost.post.files[0] ? savedPost.post.files[0].file : ""
+                savedPost.post.files[0] ? savedPost.post.files[0].file : null
               }
               likes_count={savedPost.post.likes_count}
               comments_count={savedPost.post.comments_count}

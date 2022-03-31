@@ -239,3 +239,13 @@ class UserProfileSavedPostsView(generics.ListAPIView):
     def get_queryset(self):
         queryset = super().get_queryset()
         return queryset.filter(user__username=self.kwargs['username'])
+
+
+class ExplorePostsView(generics.ListAPIView):
+    permission_classes = (permissions.IsAuthenticated,)
+    serializer_class = BasePostSerializer
+    queryset = Post.objects.prefetch_related('files',)
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        return queryset.exclude(user=self.request.user).order_by("-created_time")

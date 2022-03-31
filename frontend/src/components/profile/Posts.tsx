@@ -41,7 +41,7 @@ const Posts: React.FC = () => {
             <Post
               key={post.id}
               multiFile={post.files.length > 1}
-              image={post.files[0] ? post.files[0].file : ""}
+              image={post.files[0] ? post.files[0].file : null}
               likes_count={post.likes_count}
               comments_count={post.comments_count}
               link={routes.postDetail(post.id)}

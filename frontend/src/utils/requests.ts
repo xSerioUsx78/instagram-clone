@@ -11,6 +11,7 @@ const requests = {
   suggestions: `${endpoint}/users/suggestions`,
   getStorys: `${endpoint}/story/`,
   getPosts: `${endpoint}/post/`,
+  getExplorePosts: `${endpoint}/post/explore/`,
   getPostDetail: (postID: number) => `${endpoint}/post/${postID}/`,
   fetchUserProfilePosts: (username: string) =>
     `${endpoint}/post/user/${username}/`,

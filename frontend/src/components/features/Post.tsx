@@ -5,7 +5,7 @@ import { HeartIcon, ChatIcon, DuplicateIcon } from "@heroicons/react/solid";
 interface PostIntf {
   specialPart?: boolean;
   multiFile?: boolean;
-  image?: string;
+  image?: string | null;
   link?: string;
   likes_count?: number;
   comments_count?: number;
