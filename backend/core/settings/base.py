@@ -43,12 +43,12 @@ INSTALLED_APPS = [
     "ckeditor",
 
     # My apps
-    'users',
-    'post',
-    'story',
-    'view',
-    'like',
-    'comment'
+    'users.apps.UsersConfig',
+    'post.apps.PostConfig',
+    'story.apps.StoryConfig',
+    'view.apps.ViewConfig',
+    'like.apps.LikeConfig',
+    'comment.apps.CommentConfig'
 ]
 
 MIDDLEWARE = [

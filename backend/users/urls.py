@@ -5,13 +5,16 @@ from .views import (
 )
 
 
+app_name = "users"
+
+
 urlpatterns = [
-    path('register/', RegisterView.as_view()),
-    path('login/', LoginView.as_view()),
-    path('logout/', LogoutView.as_view()),
-    path('user/', UserView.as_view()),
-    path('info/<str:username>/', UserInfoView.as_view()),
-    path('follow/', FollowUserView.as_view()),
-    path('unfollow/', UnFollowUserView.as_view()),
-    path('suggestions/', UserSuggestionsView.as_view())
+    path('register/', RegisterView.as_view(), name="register"),
+    path('login/', LoginView.as_view(), name="login"),
+    path('logout/', LogoutView.as_view(), name="logout"),
+    path('user/', UserView.as_view(), name="user"),
+    path('info/<str:username>/', UserInfoView.as_view(), name="info"),
+    path('follow/', FollowUserView.as_view(), name="follow"),
+    path('unfollow/', UnFollowUserView.as_view(), name="unfollow"),
+    path('suggestions/', UserSuggestionsView.as_view(), name="suggestions")
 ]
