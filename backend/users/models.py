@@ -6,6 +6,7 @@ from django.utils.translation import gettext_lazy as _
 from phonenumber_field.modelfields import PhoneNumberField
 from model_utils.fields import StatusField
 from model_utils import Choices
+from .managers import UserManager
 
 # Create your models here.
 
@@ -34,6 +35,7 @@ class User(AbstractUser):
     phone_number = PhoneNumberField(null=True)
     GENDER = Choices('Male', 'Female', 'Custom', 'Prefer not to say')
     gender = StatusField(null=True, choices_name='GENDER')
+    objects = UserManager()
 
 
 def get_image_upload_to(instance, filename):

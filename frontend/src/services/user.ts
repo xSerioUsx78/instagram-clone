@@ -23,8 +23,10 @@ export const unFollowUserService = async (
   token: string | null,
   username: string
 ) => {
-  const res = await authAxios(token).post(requests.unFollowUser, {
-    username: username,
+  const res = await authAxios(token).delete(requests.unFollowUser, {
+    data: {
+      username: username,
+    },
   });
   return res;
 };

@@ -96,26 +96,25 @@ class FollowUserView(generics.GenericAPIView):
         if follower_user.followings.filter(following_user__username=following_user_username).exists():
             return Response({"message": "The was followed already."}, status=status.HTTP_200_OK)
 
-        following_user = User.objects.get(username=following_user_username)
+        following_user = get_object_or_404(User, username=following_user_username)
         Following.objects.create(
-            follower_user=follower_user, following_user=following_user)
+            follower_user=follower_user, following_user=following_user
+        )
         return Response({"message": "The user was followed successfully."}, status=status.HTTP_201_CREATED)
 
 
 class UnFollowUserView(generics.GenericAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
-    def post(self, *args, **kwargs):
+    def delete(self, *args, **kwargs):
         follower_user = self.request.user
         following_user_username = self.request.data.get('username')
-        try:
-            Following.objects.get(
-                follower_user=follower_user,
-                following_user__username=following_user_username
-            ).delete()
-            return Response({"message": "The user unfollowed successfully"}, status=status.HTTP_200_OK)
-        except:
-            return Response({"message": "The user was unfollowed already"}, status=status.HTTP_200_OK)
+        get_object_or_404(
+            Following, 
+            follower_user=follower_user, 
+            following_user__username=following_user_username
+        ).delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class UserSuggestionsView(generics.ListAPIView):
