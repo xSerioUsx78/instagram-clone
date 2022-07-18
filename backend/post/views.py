@@ -211,7 +211,11 @@ class CreatePostView(generics.GenericAPIView):
         for file in self.request.data.getlist('files'):
             PostFiles.objects.create(post=post_instance, file=file)
 
-        return Response(data=PostSerializer(post_instance).data, status=status.HTTP_201_CREATED)
+        return Response(
+            data=PostSerializer(
+                post_instance, context=self.get_serializer_context()
+            ).data, status=status.HTTP_201_CREATED
+        )
 
 
 class UserProfilePostsView(generics.ListAPIView):
