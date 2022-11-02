@@ -1,6 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.db.models.query import Prefetch
-from rest_framework import generics, permissions
+from rest_framework import generics
 from .serializers import UserStorysSerializer
 from story.models import Story
 
@@ -11,7 +11,6 @@ User = get_user_model()
 
 
 class UserFollowingStorysView(generics.ListAPIView):
-    permission_classes = (permissions.IsAuthenticated,)
     serializer_class = UserStorysSerializer
     queryset = User.objects.all().prefetch_related('profile')
 

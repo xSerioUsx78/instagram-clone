@@ -1,6 +1,6 @@
 from django.shortcuts import get_object_or_404
 from core.utils import data_is_valid
-from rest_framework import generics, permissions, status
+from rest_framework import generics, status
 from rest_framework.response import Response
 from like.models import Like
 from like.serializers import LikeSerializer
@@ -11,7 +11,6 @@ from .serializers import CommentSerializer
 
 
 class LikeView(generics.GenericAPIView):
-    permission_classes = (permissions.IsAuthenticated,)
 
     def post(self, *args, **kwargs):
         id = self.request.data.get('id')
@@ -44,7 +43,6 @@ class LikeView(generics.GenericAPIView):
 
 
 class ReplyCommentView(generics.ListAPIView):
-    permission_classes = (permissions.IsAuthenticated,)
     serializer_class = CommentSerializer
     queryset = Comment.objects.all()\
         .select_related('user', 'user__profile',).prefetch_related(

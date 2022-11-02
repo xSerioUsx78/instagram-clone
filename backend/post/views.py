@@ -2,7 +2,7 @@ from django.db.models.query import Prefetch
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
 from core.utils import data_is_valid
-from rest_framework import generics, permissions, status
+from rest_framework import generics, status
 from rest_framework.response import Response
 from comment.models import Comment
 from comment.serializers import CommentSerializer
@@ -18,7 +18,6 @@ from .serializers import (
 
 
 class PostView(generics.ListAPIView):
-    permission_classes = (permissions.IsAuthenticated,)
     serializer_class = PostSerializer
     queryset = Post.objects.all()\
         .select_related(
@@ -61,7 +60,6 @@ class PostView(generics.ListAPIView):
 
 
 class PostDetailView(generics.GenericAPIView):
-    permission_classes = (permissions.IsAuthenticated,)
 
     def get(self, request, id, *args, **kwargs):
         user_followings = request.user.followings.all()
@@ -103,7 +101,6 @@ class PostDetailView(generics.GenericAPIView):
 
 
 class LikeView(generics.GenericAPIView):
-    permission_classes = (permissions.IsAuthenticated,)
 
     def post(self, *args, **kwargs):
         id = self.request.data.get('id')
@@ -128,15 +125,13 @@ class LikeView(generics.GenericAPIView):
     def delete(self, *args, **kwargs):
         id = self.request.data.get('id')
         if data_is_valid(id):
-            obj = get_object_or_404(Post, id=id)
-            like = get_object_or_404(Like, post=obj, user=self.request.user)
+            like = get_object_or_404(Like, post__id=id, user=self.request.user)
             like.delete()
             return Response(status=status.HTTP_201_CREATED)
         return Response({'detail': 'No data provided!'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class CommentView(generics.GenericAPIView):
-    permission_classes = (permissions.IsAuthenticated,)
 
     def post(self, *args, **kwargs):
         id = self.request.data.get('id')
@@ -158,7 +153,6 @@ class CommentView(generics.GenericAPIView):
 
 
 class PostSavedView(generics.GenericAPIView):
-    permission_classes = (permissions.IsAuthenticated,)
 
     def post(self, *args, **kwargs):
         id = self.request.data.get('id')
@@ -193,7 +187,6 @@ class PostSavedView(generics.GenericAPIView):
 
 
 class CreatePostView(generics.GenericAPIView):
-    permission_classes = (permissions.IsAuthenticated,)
 
     def post(self, *args, **kwagrs):
         user = self.request.user
@@ -209,6 +202,7 @@ class CreatePostView(generics.GenericAPIView):
 
         # Getting the list of the files and creating them
         for file in self.request.data.getlist('files'):
+            # TODO: Make it bulk_create
             PostFiles.objects.create(post=post_instance, file=file)
 
         return Response(
@@ -219,7 +213,6 @@ class CreatePostView(generics.GenericAPIView):
 
 
 class UserProfilePostsView(generics.ListAPIView):
-    permission_classes = (permissions.IsAuthenticated,)
     serializer_class = BasePostSerializer
     queryset = Post.objects.prefetch_related('files',)
 
@@ -229,7 +222,6 @@ class UserProfilePostsView(generics.ListAPIView):
 
 
 class UserProfileSavedPostsView(generics.ListAPIView):
-    permission_classes = (permissions.IsAuthenticated,)
     serializer_class = BasePostSavedSerializer
     queryset = PostSaved.objects.select_related(
         'post',).prefetch_related('post__files')
@@ -246,7 +238,6 @@ class UserProfileSavedPostsView(generics.ListAPIView):
 
 
 class ExplorePostsView(generics.ListAPIView):
-    permission_classes = (permissions.IsAuthenticated,)
     serializer_class = BasePostSerializer
     queryset = Post.objects.prefetch_related('files',)
 

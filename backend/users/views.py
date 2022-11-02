@@ -16,6 +16,7 @@ User = get_user_model()
 
 
 class RegisterView(generics.GenericAPIView):
+    permission_classes = [permissions.AllowAny]
     serializer_class = RegisterSerializer
 
     def post(self, request, *args, **kwargs):
@@ -26,6 +27,7 @@ class RegisterView(generics.GenericAPIView):
 
 
 class LoginView(generics.GenericAPIView):
+    permission_classes = [permissions.AllowAny]
     serializer_class = LoginSerializer
 
     def post(self, request, *args, **kwargs):
@@ -42,7 +44,6 @@ class LoginView(generics.GenericAPIView):
 
 
 class LogoutView(generics.GenericAPIView):
-    permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
         # We get the user and destroy the token
@@ -57,7 +58,6 @@ class LogoutView(generics.GenericAPIView):
 
 
 class UserView(generics.RetrieveAPIView):
-    permission_classes = [permissions.IsAuthenticated]
     serializer_class = UserSerializer
     queryset = User.objects.all()
 
@@ -66,7 +66,6 @@ class UserView(generics.RetrieveAPIView):
 
 
 class UserInfoView(generics.GenericAPIView):
-    permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request, username, *args, **kwargs):
         user = get_object_or_404(User, username=username)
@@ -88,7 +87,6 @@ class UserInfoView(generics.GenericAPIView):
 
 
 class FollowUserView(generics.GenericAPIView):
-    permission_classes = [permissions.IsAuthenticated]
 
     def post(self, *args, **kwargs):
         follower_user = self.request.user
@@ -104,7 +102,6 @@ class FollowUserView(generics.GenericAPIView):
 
 
 class UnFollowUserView(generics.GenericAPIView):
-    permission_classes = [permissions.IsAuthenticated]
 
     def delete(self, *args, **kwargs):
         follower_user = self.request.user
@@ -118,7 +115,6 @@ class UnFollowUserView(generics.GenericAPIView):
 
 
 class UserSuggestionsView(generics.ListAPIView):
-    permission_classes = [permissions.IsAuthenticated]
     serializer_class = UserSuggestionsSerializer
     queryset = User.objects.all()
 
